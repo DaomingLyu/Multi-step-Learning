@@ -24,7 +24,7 @@ def nuFunc(zeta, pi_policy, mu_policy, state, action):
 
 
 def ABQalgorithm(env, value_function, theta, etrace, h_vec, alpha, beta, gamma, zeta, pi_policy, mu_policy, state, action, r, next_state, done):
-    ########### ABQ algorithm #########################
+    ########### ABQ(zeta) algorithm #########################
     nA = env.nA
     nS = env.nS
 
@@ -53,3 +53,31 @@ def ABQalgorithm(env, value_function, theta, etrace, h_vec, alpha, beta, gamma, 
     h_vec = h_vec + beta * (delta * etrace - np.dot(h_vec, phi) * phi)
 
     return theta, etrace, h_vec
+
+def GQalgorithm(env, value_function, theta, lamd, etrace, w_t, alpha, beta, gamma, pi_policy, mu_policy, state, action, r, next_state, done):
+    ########### GQ(lambda) algorithm #########################
+    nA = env.nA
+    nS = env.nS
+    phi = value_function.feature(state, action)
+
+    if done:
+        phi_bar_next = 0.
+    else:
+        phi_bar_next = np.sum([pi_policy[next_state, a] * value_function.feature(next_state, a) for a in np.arange(nA)], axis=0)
+
+    ########### compute TD error \delta #########################
+    delta = r + gamma * np.dot(theta, phi_bar_next) - np.dot(theta, phi)
+
+    ########### compute importance ratio #########################
+    rho = pi_policy[state, action] / mu_policy[state, action]
+
+    ########### compute trace vector #########################
+    etrace = rho * gamma * lamd * etrace
+    etrace = etrace + phi
+
+    ########### compute parameter vector #########################
+    theta = theta + alpha * ( delta*etrace - gamma* (1. - lamd)*(np.dot(etrace, w_t))*phi_bar_next)
+
+    w_t = w_t + beta*(delta*etrace - (np.dot(phi, w_t))*phi)
+
+    return theta, etrace, w_t
