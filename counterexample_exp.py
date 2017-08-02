@@ -86,7 +86,7 @@ if __name__=='__main__':
 
                 theta_ABQ, etrace, h_vec = ABQalgorithm(env, value_function, theta_ABQ, etrace, h_vec, alpha, beta, discount_factor, zeta, target_policy, behaviour_policy, state, action, reward, next_state, done)
 
-                theta_GQ, et, w_t = GQalgorithm(env, value_function, theta_GQ, lamd, et, w_t, alpha, beta, discount_factor, target_policy, behaviour_policy, state, action, r, next_state, done)
+                theta_GQ, et, w_t = GQalgorithm(env, value_function, theta_GQ, lamd, et, w_t, alpha, beta, discount_factor, target_policy, behaviour_policy, state, action, reward, next_state, done)
 
                 if done:
                     break
